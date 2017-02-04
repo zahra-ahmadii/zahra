@@ -3,7 +3,7 @@ import re
 tokens = ('NUMBER','PLUS','MENHA','ZARB','TAGHSIM','PARANTEZBAZ','PRANTEZBASTE',
           'RESHTE','MOSAVI','INTMAIN','KOROSHEBAZ','KOROSHEBASTE','IF','ELSE'
           ,'WHILE','PRINT','INPUT','COTEITION','BODY','EQUAL','NOTEQUAL','K',
-          'BO','BM','KM','KAMA','SIN','COS','TAN','POW','SQRT','INT','DOUBLE','STRING','FASELE') 
+          'BO','BM','KM','KAMA','SIN','COS','TAN','POW','SQRT','INT','DOUBLE','STRING','FASELE','LINE') 
 t_PLUS    = r'\+'
 t_MENHA   =r'\-'
 t_ZARB=r'\*'
@@ -94,6 +94,10 @@ def t_K(t):
 def t_EQUAL(t):
     r':='
     return t
+def t_LINE(t):
+    r'\n+'
+    t.lexer.lineno += t.value.count("\n")
+    #return t
 def memAloc():
     global memID
     memID += 1
@@ -138,9 +142,96 @@ def p_SE(p):
 def p_b(p):
     'A : BODY'
     p[0]=p[1]
+
+
+def p_w(p):
+    'A : WHILE PARANTEZBAZ CONDITION  PRANTEZBASTE KOROSHEBAZ A'
+    L1='L'+lable_counter()
+    L2='L'+lable_counter()
+    print(p[3])
+    p[0]=(L1+','+p[3]+','+'jnz'+L2+','+p[6]+','+'goto'+L1+','+L2+'\n')
+    f3.writelines(p[0])
+   # p[0]=["WHILE" ,p[3],' JUMP ','LABLE',lable_counter(),p[6],'\n','ELSE','JUMP','LABLE',lable_counter(),':\n']
+    print(p[0])
+    
+'''def p_if(p):
+    'A : IF PARANTEZBAZ CONDITION PRANTEZBASTE KOROSHEBAZ A KOROSHEBASTE'
+    p[0]=["IF" ,P[3],' JUMP ','LABLE',lable_counter(),'\n','LABLE',lable_counter(),':\n']
+    #labl= newLabel()
+    #p[0]=[p[3],"if_false","jump labl1",p[6],"goto labl1",labl1]'''
+    
+def p_ife(p):
+    'A : IF PARANTEZBAZ CONDITION PRANTEZBASTE KOROSHEBAZ A  KOROSHEBASTE ELSE KOROSHEBAZ A'
+    print(p[6])
+    L1='L'+lable_counter()
+    L2='L'+lable_counter()
+    p[0]=(p[3]+','+'jnz'+L1+','+p[6]+','+'goto'+L2+','+L1+','+p[10]+','+L2+'\n')
+    #p[0]=["IF" ,p[3],' JUMP ','LABLE',lable_counter(),'ELSE','\n','LABLE',lable_counter(),':\n']
+    print(p[0])
 def p_la(p):
     'A : '
-    #p[0]=p[1]
+    p[0]=''
+def p_koroshe(p):
+    'A : KOROSHEBASTE'
+    p[0]=p[1]
+    
+def p_a_A(p):
+    'A : A'
+    p[0]=p[1]
+def p_LINE(p):
+    'A : LINE'
+    p[0]=p[1]
+def p_input(p):
+    r'A : RESHTE MOSAVI INPUT PARANTEZBAZ PRANTEZBASTE'
+    p[0]=p[1]
+    f3.writelines('INPUT'+'('+p[0]+')'+'\n')
+    p[0]=input()
+    #dic.update(dic[p[1]])=p[0]
+    #dic[p[1]].append(p[0])
+def p_PRINT(p):
+    'A : PRINT PARANTEZBAZ DD RESHTE DD PRANTEZBASTE'
+    if(p[3]=='\''):
+        p[0]=('\''+p[4]+'\'')
+    elif p[4] in dic:
+        p[0]=dic[p[4]][1]
+    
+    f3.writelines('PRINT'+'('+p[0]+')'+'\n')
+    print(p[0])
+def p_RESHTE2(p):
+   'A : RESHTE MOSAVI RESHTE'
+   p[1]=p[3]
+   p[0]=p[1]
+def p_RESHTE_e(p):
+   'A : RESHTE MOSAVI E'
+   #print(dic)
+   
+   if type(p[3]) == tuple:
+       print('hhh')
+       print(p[3][0])
+       print(dic[p[1]][1],'=',str(p[3][1]),'\n')
+       f3.writelines(p[3][0])
+       f3.writelines(dic[p[1]][1]+"="+str(p[3][1])+'\n')
+   elif(type(p[3])!= tuple):
+     if p[1] in dic:
+          #if(dic[p[1]][1]!=p[3]):
+      dic[p[1]][1]=p[3]
+   #p[1]=p[3]
+      p[0]=dic[p[1]][1]
+      #f3.writelines(dic[p[1]][1]+"="+str(p[3])+'\n')
+      f3.writelines(p[1]+'='+dic[p[1]][1]+'\n')
+   #print(p[1][0])
+      print(p[1],'=',dic[p[1]][1])
+     else:
+         print('nnooo')
+   ''' print(dic[p[1]][1])
+   if(type(dic[p[1]][0])==int):
+     if type(p[3]) == tuple:
+       print('hhh')
+       print(p[3][0])
+       print(dic[p[1]][0],'=',str(p[3][1]),'\n')
+       f3.writelines(p[3][0])
+       f3.writelines(dic[p[1]][0]+"="+str(p[3][1])+'\n')
+   elif(dic[p[1]][1]!=''):'''
 def p_type(p):
     'A : TYPE RESHTE'
     dic[p[2]]=[p[1],memAloc()]
@@ -156,58 +247,7 @@ def p_type2(p):
 def p_type3(p):
     'TYPE : STRING'
     p[0]=p[1]
-    print(p[0])
-def p_w(p):
-    'A : WHILE PARANTEZBAZ CONDITION  PRANTEZBASTE KOROSHEBAZ A KOROSHEBASTE'
-    L1='L'+lable_counter()
-    L2='L'+lable_counter()
-    p[0]=[L1,p[3],'jnz'+ L2,p[6],'goto'+L1,L2]
-   # p[0]=["WHILE" ,p[3],' JUMP ','LABLE',lable_counter(),p[6],'\n','ELSE','JUMP','LABLE',lable_counter(),':\n']
-    print(p[0])
-    
-'''def p_if(p):
-    'A : IF PARANTEZBAZ CONDITION PRANTEZBASTE KOROSHEBAZ A KOROSHEBASTE'
-    p[0]=["IF" ,P[3],' JUMP ','LABLE',lable_counter(),'\n','LABLE',lable_counter(),':\n']
-    #labl= newLabel()
-    #p[0]=[p[3],"if_false","jump labl1",p[6],"goto labl1",labl1]'''
-    
-def p_ife(p):
-    'A : IF PARANTEZBAZ CONDITION2 PRANTEZBASTE KOROSHEBAZ A  KOROSHEBASTE ELSE KOROSHEBAZ A KOROSHEBASTE '
-    L1='L'+lable_counter()
-    L2='L'+lable_counter()
-    p[0]=[p[3],'jnz'+L1,p[6],'goto'+ L2, L1 ,p[10],L2]
-    #p[0]=["IF" ,p[3],' JUMP ','LABLE',lable_counter(),'ELSE','\n','LABLE',lable_counter(),':\n']
-    print(p[0])
-    
-def p_input(p):
-    r'A : RESHTE MOSAVI INPUT PARANTEZBAZ PRANTEZBASTE'
-    p[0]=p[1]
-    p[0]=input()
-    #dic.update(dic[p[1]])=p[0]
-    #dic[p[1]].append(p[0])
-def p_PRINT(p):
-    'A : PRINT PARANTEZBAZ DD RESHTE DD PRANTEZBASTE'
-    p[0]=('\''+p[4]+'\'')
-    print(p[0])
-def p_RESHTE2(p):
-   'A : RESHTE MOSAVI RESHTE'
-   p[1]=p[3]
-   p[0]=p[1]
-def p_RESHTE1(p):
-   'A : RESHTE MOSAVI E'
-   if type(p[3]) == tuple:
-        print(888)
-        print(p[3][0])
-        #print(dic.get(p[1])
-        print(dic[p[1]][1],'=',str(p[3][1]),'\n')
-        f3.writelines(p[3][0])
-        f3.writelines(dic[p[1]][1]+"="+str(p[3][1])+'\n')
-   else:
-    dic[p[1]]=p[3]
-   #p[1]=p[3]
-    p[0]=p[1]
-   #print(p[1][0])
-    print(p[1],'=',dic[p[1]])
+    print(p[0])   
 def p_CONDITION2(p):
     'CONDITION2 : TY K TY'
     if(p[2]=='<'):
@@ -215,13 +255,20 @@ def p_CONDITION2(p):
 def p_CONDITION(p):
     'CONDITION : TY K TY'         
     if(p[2]=='<'):
-      p[0]=(str(p[1])+'<'+str(p[3]))
-def p_ty(p):
-    'TY : RESHTE'
-    p[0]=p[1]
+      p[0]=(p[1]+'<'+p[3])
 def p_ty2(p):
     'TY : F'
     p[0]=p[1]
+def p_ty(p):
+    'TY : RESHTE'
+    #print(dic[p[1]][0])
+   # print(p[1])
+    if p[1] in dic:
+     p[0]=dic[p[1]][1]
+     print(p[0]+"LLLLLLLL")
+    else:
+        print('nnono')
+
 def p_sin(p):
     'A : RESHTE MOSAVI SIN PARANTEZBAZ NUMBER PRANTEZBASTE'
     
@@ -253,18 +300,19 @@ def p_sqrt(p):
     dic[p[1]]=[math.sqrt(float(p[5]))]
     p[0]=p[1]
     print(p[1],'=',dic[p[1]])
+def p_DD2(p):
+    r'DD : '
+    p[0]=''
 def p_DD(p):
     r'DD : COTEITION'
     p[0]=p[1]
-def p_DD2(p):
-    r'DD : '
-    p[0]='0'
+
 '''def p_TY(p):
     'TY : RESHTE'
     P[0]=P[1]'''
 def p_e_e_t(p):
    'E : E PLUS T'
-   
+   #print(p[1]+"ooo")
    oprand1 =''
    oprand2 =''
    beforCode = ''
@@ -273,7 +321,8 @@ def p_e_e_t(p):
         #a=float(oprand1)
         beforCode += p[1][0]
    else:
-        oprand1 = p[1]
+        
+         oprand1 = p[1]
         #a=float(oprand1)
    if type(p[3]) == tuple:
         oprand2 = p[3][1]
@@ -396,7 +445,14 @@ def p_f_e_m(p):
 
    
 
-     
+def p_f_a2(p):
+   
+   'F : RESHTE'
+   if p[1] in dic:
+    p[0]=dic[p[1]][1]
+    print(p[0]+"kkkkkk")
+   else:
+       print('errror')
 def p_f_a(p):
    
    'F : NUMBER'
@@ -518,7 +574,25 @@ while(1):
         print(557)
         print(result.group(1))
         araye[result.group(1)]=araye[result.group(2)]
-
+ result=re.match(r'L(\d+),((\d+)(<)(\d+)),jnzL(\d+),(.*),gotoL(\d+),L(\d+)\n',order)
+ if(result):
+     #c=result.group()
+     a=result.group(3)
+     b=result.group(5)
+     if(result.group(4)=='<'):
+         if(a<b):
+             res='y'
+             print(res)
+         else:
+             res='n'
+     '''if(res=='y'):
+       # while(a<b):
+             f_read1.close();
+             f_read1=open("zari3.txt","r")
+             line1=f_read1.readline()
+             if(line1!='}'+'\n'):
+             #while(line1==c+":\n"):
+                  line1=f_read1.readline()'''
 print(araye)
 
 #print(dic)   
