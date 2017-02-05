@@ -151,6 +151,7 @@ def p_w(p):
     print(p[3])
     p[0]=(L1+','+p[3]+','+'jnz'+L2+','+p[6]+','+'goto'+L1+','+L2+'\n')
     f3.writelines(p[0])
+    f3.writelines(p[5]+'\n')
    # p[0]=["WHILE" ,p[3],' JUMP ','LABLE',lable_counter(),p[6],'\n','ELSE','JUMP','LABLE',lable_counter(),':\n']
     print(p[0])
     
@@ -174,7 +175,7 @@ def p_la(p):
 def p_koroshe(p):
     'A : KOROSHEBASTE'
     p[0]=p[1]
-    
+    #f3.writelines(p[0]+'\n')
 def p_a_A(p):
     'A : A'
     p[0]=p[1]
@@ -184,7 +185,7 @@ def p_LINE(p):
 def p_input(p):
     r'A : RESHTE MOSAVI INPUT PARANTEZBAZ PRANTEZBASTE'
     p[0]=p[1]
-    f3.writelines('INPUT'+'('+p[0]+')'+'\n')
+    f3.writelines(p[1]+'='+'INPUT'+'('+')'+'\n')
     p[0]=input()
     #dic.update(dic[p[1]])=p[0]
     #dic[p[1]].append(p[0])
@@ -214,13 +215,13 @@ def p_RESHTE_e(p):
    elif(type(p[3])!= tuple):
      if p[1] in dic:
           #if(dic[p[1]][1]!=p[3]):
-      dic[p[1]][1]=p[3]
+      #dic[p[1]][1]=p[3]
    #p[1]=p[3]
-      p[0]=dic[p[1]][1]
+      p[0]=p[3]
       #f3.writelines(dic[p[1]][1]+"="+str(p[3])+'\n')
-      f3.writelines(p[1]+'='+dic[p[1]][1]+'\n')
+      f3.writelines(dic[p[1]][1]+'='+p[3]+'\n')
    #print(p[1][0])
-      print(p[1],'=',dic[p[1]][1])
+      print(dic[p[1]][1],'=',p[3])
      else:
          print('nnooo')
    ''' print(dic[p[1]][1])
@@ -276,29 +277,34 @@ def p_sin(p):
    # p[0]=p[1]
     dic[p[1]]=[math.sin(float(p[5]))]
     p[0]=p[1]
+    f3.writelines(p[1]+'='+'SIN'+'('+p[5]+')'+'\n')
     print(p[1],'=',dic[p[1]])
    
 def p_cos(p):
     'A : RESHTE MOSAVI COS PARANTEZBAZ E PRANTEZBASTE'
     dic[p[1]]=[math.cos(float(p[5]))]
     p[0]=p[1]
+    f3.writelines(p[1]+'='+'COS'+'('+p[5]+')'+'\n')
     print(p[1],'=',dic[p[1]])
    
 def p_tan(p):
     'A : RESHTE MOSAVI TAN PARANTEZBAZ E PRANTEZBASTE'
     dic[p[1]]=[math.tan(float(p[5]))]
     p[0]=p[1]
+    f3.writelines(p[1]+'='+'TAN'+'('+p[5]+')'+'\n')
     print(p[1],'=',dic[p[1]])
    
 def p_pow(p):
     'A : RESHTE MOSAVI POW PARANTEZBAZ E KAMA E PRANTEZBASTE'
     dic[p[1]]=[math.pow(float(p[5]),float(p[7]))]
     p[0]=p[1]
+    f3.writelines(p[1]+'='+'POW'+'('+p[5]+','+p[7]+')'+'\n')
     print(p[1],'=',dic[p[1]])
 def p_sqrt(p):
     'A : RESHTE MOSAVI SQRT PARANTEZBAZ E PRANTEZBASTE'
     dic[p[1]]=[math.sqrt(float(p[5]))]
     p[0]=p[1]
+    f3.writelines(p[1]+'='+'SQRT'+'('+p[5]+')'+'\n')
     print(p[1],'=',dic[p[1]])
 def p_DD2(p):
     r'DD : '
@@ -506,18 +512,18 @@ while(1):
  result=re.match("END\n",order)
  if(result):
      break
- result=re.match(r'ADD (\[?)((\d+)|(\d+\.\d+))(\]?),(\[?)((\d+)|(\d+\.\d+))(\]?),\[(\d+)\]',order)
+ result=re.match(r'ADD ((\[(\d+)\])|(\d+|(\d+\.\d+))),((\[(\d+)\])|(\d+|(\d+\.\d+))),\[(\d+)\]',order)
  #print(result)
  if(result):
-    if(result.group(1)==''):
-        a=float(result.group(2))
+    if(result.group(3)==''):
+        a=float(result.group(4))
     else:
-        a=araye[result.group(2)]
+        a=araye[result.group(3)]
    # print(a)
-    if(result.group(6)==''):
-      b=float(result.group(7))
+    if(result.group(8)==''):
+      b=float(result.group(9))
     else:
-        b=araye[result.group(7)]
+        b=araye[result.group(8)]
     #print(b)
     
     #y1=result.group(11)
@@ -574,6 +580,32 @@ while(1):
         print(557)
         print(result.group(1))
         araye[result.group(1)]=araye[result.group(2)]
+ result=re.match(r'PRINT(\()(\'?)((\d+|\d+\.\d+)|([a-zA-Z][a-zA-Z0-9 _\t]*))(\'?)(\))',order)
+ if(result):
+     if(result.group(2)==''):
+             print(result.group(3))
+            
+     if(result.group(2)!=''):
+          print(result.group(3))
+ result=re.match(r'([a-zA-Z][a-zA-Z0-9 _\t]*)=INPUT(\()(\))',order)
+ if(result):
+     #print('hoho')
+     araye[result.group(1)]=input()
+ result=re.match(r'([a-zA-Z][a-zA-Z0-9 _\t]*)=SIN(\()(\d+)(\))',order)
+ if(result):
+     araye[result.group(1)]=math.sin(float(result.group(3)))
+ result=re.match(r'([a-zA-Z][a-zA-Z0-9 _\t]*)=COS(\()(\d+)(\))',order)
+ if(result):
+     araye[result.group(1)]=math.cos(float(result.group(3)))
+ result=re.match(r'([a-zA-Z][a-zA-Z0-9 _\t]*)=TAN(\()(\d+)(\))',order)
+ if(result):
+     araye[result.group(1)]=math.tan(float(result.group(3)))
+ result=re.match(r'([a-zA-Z][a-zA-Z0-9 _\t]*)=POW(\()(\d+),(\d+)(\))',order)
+ if(result):
+     araye[result.group(1)]=math.pow(float(result.group(3)),float(result.group(4)))
+ result=re.match(r'([a-zA-Z][a-zA-Z0-9 _\t]*)=SQRT(\()(\d+)(\))',order)
+ if(result):
+     araye[result.group(1)]=math.sqrt(float(result.group(3)))
  result=re.match(r'L(\d+),((\d+)(<)(\d+)),jnzL(\d+),(.*),gotoL(\d+),L(\d+)\n',order)
  if(result):
      #c=result.group()
@@ -584,15 +616,19 @@ while(1):
              res='y'
              print(res)
          else:
-             res='n'
-     '''if(res=='y'):
-       # while(a<b):
+            res='n'
+     if(res=='y'):
              f_read1.close();
              f_read1=open("zari3.txt","r")
-             line1=f_read1.readline()
-             if(line1!='}'+'\n'):
-             #while(line1==c+":\n"):
-                  line1=f_read1.readline()'''
+             line2=f_read1.readline()
+             while(1):
+                 if(line2!='{'+'\n'):
+                     line2=f_read1.readline()
+                     print('zahraaaaaaaa')
+                    
+                 else:
+                   print('noozahraaaaaaaa')
+                   break
 print(araye)
 
 #print(dic)   
