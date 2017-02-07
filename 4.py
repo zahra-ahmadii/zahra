@@ -13,6 +13,8 @@ t_KOROSHEBASTE=r'}'
 t_KAMA=r','
 dic={}
 memID=0
+global c,c1
+c1=1
 lbl_counter=0
 f3=open("zari3.txt","w")
 global flag,y
@@ -162,20 +164,33 @@ def p_w(p):
     #p[0]=[p[3],"if_false","jump labl1",p[6],"goto labl1",labl1]'''
     
 def p_ife(p):
-    'A : IF PARANTEZBAZ CONDITION PRANTEZBASTE KOROSHEBAZ A  KOROSHEBASTE ELSE KOROSHEBAZ A'
+    'A : IF PARANTEZBAZ CONDITION PRANTEZBASTE KOROSHEBAZ A'
     print(p[6])
     L1='L'+lable_counter()
     L2='L'+lable_counter()
-    p[0]=(p[3]+','+'jnz'+L1+','+p[6]+','+'goto'+L2+','+L1+','+p[10]+','+L2+'\n')
+    p[0]=(p[3]+','+'jnz'+L1+','+p[6]+','+'goto'+L2+'\n')
+    f3.writelines(p[0])
+    f3.writelines(p[5]+'\n')
+    
     #p[0]=["IF" ,p[3],' JUMP ','LABLE',lable_counter(),'ELSE','\n','LABLE',lable_counter(),':\n']
     print(p[0])
+
+def p_ife2(p):
+    'A : ELSE KOROSHEBAZ A'
+    L1='L'+lable_counter()
+    L2='L'+lable_counter()
+    p[0]=(L1+','+p[3]+','+L2)
+    print(p[0])
+    f3.writelines(p[0])
+    f3.writelines(p[2]+'\n')
+    
 def p_la(p):
     'A : '
     p[0]=''
 def p_koroshe(p):
     'A : KOROSHEBASTE'
-    p[0]=p[1]
-    #f3.writelines(p[0]+'\n')
+    p[0]=(p[1])
+    f3.writelines(p[0]+'\n')
 def p_a_A(p):
     'A : A'
     p[0]=p[1]
@@ -509,18 +524,20 @@ araye={}
 while(1):
  line2=f_read1.readline()
  order=line2
+ print(order)
  result=re.match("END\n",order)
  if(result):
      break
  result=re.match(r'ADD ((\[(\d+)\])|(\d+|(\d+\.\d+))),((\[(\d+)\])|(\d+|(\d+\.\d+))),\[(\d+)\]',order)
  #print(result)
  if(result):
-    if(result.group(3)==''):
+   # print(araye)
+    if(result.group(3)==None):
         a=float(result.group(4))
     else:
         a=araye[result.group(3)]
    # print(a)
-    if(result.group(8)==''):
+    if(result.group(8)==None):
       b=float(result.group(9))
     else:
         b=araye[result.group(8)]
@@ -528,62 +545,68 @@ while(1):
     
     #y1=result.group(11)
     araye[result.group(11)]=a+b
- result=re.match(r'SUB (\[?)((\d+)|(\d+\.\d+))(\]?),(\[?)((\d+)|(\d+\.\d+))(\]?),\[(\d+)\]',order)
+ result=re.match(r'SUB ((\[(\d+)\])|(\d+|(\d+\.\d+))),((\[(\d+)\])|(\d+|(\d+\.\d+))),\[(\d+)\]',order)
  #print(result)
  if(result):
-    if(result.group(1)==''):
-        a=float(result.group(2))
+    if(result.group(3)==None):
+        a=float(result.group(4))
     else:
-        a=araye[result.group(2)]
+        a=araye[result.group(3)]
    # print(a)
-    if(result.group(6)==''):
-      b=float(result.group(7))
+    if(result.group(8)==None):
+      b=float(result.group(9))
     else:
-        b=araye[result.group(7)]
+        b=araye[result.group(8)]
     #print(b)
     
     #y1=result.group(11)
     araye[result.group(11)]=a-b
- result=re.match(r'MUL (\[?)((\d+)|(\d+\.\d+))(\]?),(\[?)((\d+)|(\d+\.\d+))(\]?),\[(\d+)\]',order)
+ result=re.match(r'MUL ((\[(\d+)\])|(\d+|(\d+\.\d+))),((\[(\d+)\])|(\d+|(\d+\.\d+))),\[(\d+)\]',order)
  if(result):
     #print(555)
-    if(result.group(1)==''):
-      a=int(result.group(2))
+    if(result.group(3)==None):
+      a=int(result.group(4))
     else:
-        a=araye[result.group(2)]
+        a=araye[result.group(3)]
     #print(a)
-    if(result.group(6)==''):
-      b=int(result.group(7))
+    if(result.group(8)==None):
+      b=int(result.group(9))
     else:
-        b=araye[result.group(7)]
+        b=araye[result.group(8)]
     
     #y1=result.group(11)
     araye[result.group(11)]=a*b
- result=re.match(r'TAGHSIM (\[?)((\d+)|(\d+\.\d+))(\]?),(\[?)((\d+)|(\d+\.\d+))(\]?),\[(\d+)\]',order)
+ result=re.match(r'TAGHSIM ((\[(\d+)\])|(\d+|(\d+\.\d+))),((\[(\d+)\])|(\d+|(\d+\.\d+))),\[(\d+)\]',order)
  #print(result)
  if(result):
-    if(result.group(1)==''):
-        a=float(result.group(2))
+    if(result.group(3)==None):
+        a=float(result.group(4))
     else:
-        a=araye[result.group(2)]
+        a=araye[result.group(3)]
    # print(a)
-    if(result.group(6)==''):
-      b=float(result.group(7))
+    if(result.group(8)==None):
+      b=float(result.group(9))
     else:
-        b=araye[result.group(7)]
+        b=araye[result.group(8)]
     #print(b)
     
     #y1=result.group(11)
     araye[result.group(11)]=a/b
- result=re.match(r'\[(\d+)\] = \[(\d+)\]\n',order)
+ result=re.match(r'\[(\d+)\]=((\[(\d+)\])|(\d+))',order)
  if(result):
-        print(557)
-        print(result.group(1))
-        araye[result.group(1)]=araye[result.group(2)]
- result=re.match(r'PRINT(\()(\'?)((\d+|\d+\.\d+)|([a-zA-Z][a-zA-Z0-9 _\t]*))(\'?)(\))',order)
+        #print(557)
+        #print(result.group(4))
+        if(result.group(4)==None):
+            araye[result.group(1)]=float(result.group(5))
+          
+        else:
+            araye[result.group(1)]=araye[result.group(4)]
+ result=re.match(r'PRINT(\()(\'?)((\[(\d+)\])|(\d+|\d+\.\d+)|([a-zA-Z][a-zA-Z0-9 _\t]*))(\'?)(\))',order)
  if(result):
+     #print(result.group(2))
      if(result.group(2)==''):
-             print(result.group(3))
+             #print('**********')
+             print(araye[result.group(5)])
             
      if(result.group(2)!=''):
           print(result.group(3))
@@ -606,27 +629,39 @@ while(1):
  result=re.match(r'([a-zA-Z][a-zA-Z0-9 _\t]*)=SQRT(\()(\d+)(\))',order)
  if(result):
      araye[result.group(1)]=math.sqrt(float(result.group(3)))
- result=re.match(r'L(\d+),((\d+)(<)(\d+)),jnzL(\d+),(.*),gotoL(\d+),L(\d+)\n',order)
+ result=re.match(r'L(\d+),((\[(\d+)\])(<)(\[(\d+)\])),jnzL(\d+),(.*),gotoL(\d+),L(\d+)\n',order)
  if(result):
      #c=result.group()
-     a=result.group(3)
-     b=result.group(5)
-     if(result.group(4)=='<'):
+     a=araye[result.group(4)]
+     b=araye[result.group(7)]
+     if(result.group(5)=='<'):
          if(a<b):
              res='y'
+             global c
+             c=b-a
+             
              print(res)
          else:
             res='n'
-     if(res=='y'):
+    
+ result=re.match(r'}\n',order)
+ if(result):
+     
+     if( res=='y' and(c1<c-1)):
+             c1=c1+1
+             print(c)
              f_read1.close();
              f_read1=open("zari3.txt","r")
              line2=f_read1.readline()
+            # while( c1<c):
+             #    c1=c1+1
              while(1):
                  if(line2!='{'+'\n'):
                      line2=f_read1.readline()
                      print('zahraaaaaaaa')
-                    
                  else:
+                   #line2=f_read1.readline()
+                  # print(line2)
                    print('noozahraaaaaaaa')
                    break
 print(araye)
