@@ -2,8 +2,8 @@ import math
 import re
 tokens = ('NUMBER','PLUS','MENHA','ZARB','TAGHSIM','PARANTEZBAZ','PRANTEZBASTE',
           'RESHTE','MOSAVI','MAIN','KOROSHEBAZ','KOROSHEBASTE','IF','ELSE'
-          ,'WHILE','PRINT','INPUT','COTEITION','BODY','EQUAL','NOTEQUAL','K',
-          'BO','BM','KM','M','KAMA','SIN','COS','TAN','POW','SQRT','INT','DOUBLE','STRING','FASELE','LINE','VOID') 
+          ,'WHILE','PRINT','INPUT','COTEITION','NOTEQUAL','K',
+          'BO','BM','KM','M','KAMA','SIN','COS','TAN','POW','SQRT','INT','DOUBLE','STRING','VOID') 
 t_PLUS    = r'\+'
 t_MENHA   =r'\-'
 t_ZARB=r'\*'
@@ -62,9 +62,7 @@ def t_POW(t):
 def t_SQRT(t):
     r'sqrt'
     return t
-#def t_KOROSHEBASTE(t):
- #   r'\}'
-  #  return t
+
 def t_IF(t):
     r'if'
     return t
@@ -142,9 +140,7 @@ def p_SE(p):
     r'A : E '
     #print(p[1][0])
     p[0]=p[1]
-def p_b(p):
-    'A : BODY'
-    p[0]=p[1]
+
 
 
 def p_w(p):
@@ -184,12 +180,7 @@ def p_koroshe(p):
     'A : KOROSHEBASTE'
     p[0]=(p[1])
     f3.writelines(p[0]+'\n')
-def p_a_A(p):
-    'A : A'
-    p[0]=p[1]
-def p_LINE(p):
-    'A : LINE'
-    p[0]=p[1]
+
 def p_input(p):
     r'A : RESHTE MOSAVI INPUT PARANTEZBAZ PRANTEZBASTE'
     p[0]=p[1]
@@ -247,12 +238,9 @@ def p_type3(p):
     'TYPE : STRING'
     p[0]=p[1]
     #print(p[0])   
-def p_CONDITION2(p):
-    'CONDITION2 : TY K TY'
-    if(p[2]=='<'):
-      p[0]=(str(p[1])+'>='+str(p[3]))
+
 def p_CONDITION(p):
-    'CONDITION : TY K TY'         
+    'CONDITION : TY ALAMAT TY'         
     if(p[2]=='<'):
       p[0]=(p[1]+'<'+p[3])
     elif(p[2]=='>'):
@@ -263,18 +251,20 @@ def p_CONDITION(p):
         p[0]=(p[1]+'<='+p[3])
     elif(p[2]=='!='):
         p[0]=(p[1]+'!='+p[3])
+def p_alamat(p):
+    '''ALAMAT : K
+              | BO
+              | KM
+              | M
+              | BM
+              | NOTEQUAL'''
+    p[0]=p[1]
 def p_ty2(p):
     'TY : F'
     p[0]=p[1]
-def p_ty(p):
-    'TY : RESHTE'
-    #print(dic[p[1]][0])
-   # print(p[1])
-    if p[1] in dic:
-     p[0]=dic[p[1]][1]
+
      
-    else:
-        print('eror reshte')
+   
 
 def p_sin(p):
     'A : RESHTE MOSAVI SIN PARANTEZBAZ NUMBER PRANTEZBASTE'
@@ -605,7 +595,7 @@ while(1):
      if(result.group(5)=='<'):
          if(a<b):
              res='y'
-             global c
+             
              c=b-a
              #print(res)
          else:
@@ -613,7 +603,7 @@ while(1):
      elif(result.group(5)=='>'):
          if(a>b):
              res='y'
-             global c
+             
              c=a-b
              #print(res)
          else:
@@ -621,7 +611,7 @@ while(1):
      elif(result.group(5)=='<='):
       if(a<=b):
              res='y'
-             global c
+             
              c=(b-a)+1
              #print(res)
       else:
@@ -629,7 +619,7 @@ while(1):
      elif(result.group(5)=='>='):
        if(a>=b):
              res='y'
-             global c
+             
              c=(a-b)+1
              #print(res)
        else:
@@ -637,7 +627,7 @@ while(1):
      elif(result.group(5)=='!='):
       if(a!=b):
              res='y'
-             global c
+             
              
              if(a>b):
                c=(a-b)+1
